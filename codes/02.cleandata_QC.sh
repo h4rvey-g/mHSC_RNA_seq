@@ -19,4 +19,4 @@ outdir=./results/02.CleanData_QC
 export -f getFastqc
 parallel --progress --keep-order --line-buffer getFastqc :::: <(find $indir -type f -name "*.fq.gz")
 # use multiqc to combine the reports from the folder $outdir, name the integrated report file with outdir name, put the output report file into $outdir
-/data0/apps/anaconda3/bin/multiqc -i $outdir -o $outdir $outdir
+/data0/apps/anaconda3/bin/multiqc -o $outdir -n $(basename $outdir).html $outdir 
