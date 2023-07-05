@@ -1,6 +1,12 @@
 # data folder
 data/
 *.zip
+*fastqc.html
+# ignore file contains multiqc AND end with json, or txt, or log
+multiqc*.json
+multiqc*.txt
+multiqc*.log
+!**/*multiqc.html
 # History files
 .Rhistory
 .Rapp.history
