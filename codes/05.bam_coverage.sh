@@ -9,13 +9,13 @@ for bamfile in /mHSC_RNA_seq/data/04.STARalign/*/*.bam; do
     fi
 done
 # use multiBamSummary to get the coverage of all bam files in /mHSC_RNA_seq/data/04.STARalign
-# multiBamSummary bins \
-#     --bamfiles /mHSC_RNA_seq/data/04.STARalign/*/*.bam \
-#     --labels $(ls /mHSC_RNA_seq/data/04.STARalign/*/*.bam | xargs -n 1 basename | sed 's/Aligned\.sortedByCoord\.out\.bam$//') \
-#     --numberOfProcessors 30 \
-#     --outRawCounts /mHSC_RNA_seq/results/05.bam_coverage/STARalign_clean_counts.tab \
-#     --outFileName /mHSC_RNA_seq/results/05.bam_coverage/STARalign_clean.npz \
-#     --binSize 10000
+multiBamSummary bins \
+    --bamfiles /mHSC_RNA_seq/data/04.STARalign/*/*.bam \
+    --labels $(ls /mHSC_RNA_seq/data/04.STARalign/*/*.bam | xargs -n 1 basename | sed 's/Aligned\.sortedByCoord\.out\.bam$//') \
+    --numberOfProcessors 30 \
+    --outRawCounts /mHSC_RNA_seq/results/05.bam_coverage/STARalign_clean_counts.tab \
+    --outFileName /mHSC_RNA_seq/results/05.bam_coverage/STARalign_clean.npz \
+    --binSize 10000
 # use plotCorrelation to plot the correlation between samples
 plotCorrelation \
     --corData /mHSC_RNA_seq/results/05.bam_coverage/STARalign_clean.npz \
