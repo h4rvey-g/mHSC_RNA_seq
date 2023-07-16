@@ -2,27 +2,28 @@
 # call DEGs using DESeq2
 library("data.table")
 
-indir = "3.STARalign_clean"
-outdir = "5.DEG"
+indir = "./data/04.STARalign"
+outdir = "./data/07.DEG"
 dir.create(outdir, showWarnings = T, recursive = T)
 #get the sample infomation
-sample_meta = fread("samples.txt", header = F)
-sample_names = sample_meta$V4
+sample_meta = fread("./data/samples.txt", header = F)
+sample_names = sample_meta$V1
+sample_group = sample_meta$V3
 
-df = fread(paste0(indir, "/",sample_names[1],"/",sample_names[1],"ReadsPerGene.out.tab"))
+df = fread(paste0(indir, "/",sample_names[1],"-",sample_group[1],"/",sample_names[1],"-",sample_group[1],"ReadsPerGene.out.tab"))
 countData = df[,c(1, 2)]
 for (i in 2:length(sample_names)) {
-  df = fread(paste0(indir, "/",sample_names[i],"/",sample_names[i],"ReadsPerGene.out.tab"))
+  df = fread(paste0(indir, "/",sample_names[i],"-",sample_group[i],"/",sample_names[i],"-",sample_group[i],"ReadsPerGene.out.tab"))
   count = df[,2]
   countData = cbind(countData, count)
 }
 ###Skip first 4 lines, count data starts on the 5th line
 countData = countData[c(5:nrow(countData)), ]
 
-# Noet: all STAR outputs have the same GeneID order defined by the STARindex file “geneInfo.tab”
+# Note: all STAR outputs have the same GeneID order defined by the STARindex file “geneInfo.tab”
 # so we can cbind them directly and use the index file to get the geneNames
 
-geneInfo = fread("STARindex/geneInfo.tab")
+geneInfo = fread("./data/00.reference/STARindex/geneInfo.tab")
 
 countData = cbind(geneInfo, countData[, -1])
 
@@ -53,7 +54,7 @@ library(GenomicFeatures)
 
 
 ## make TxDb from GTF file 
-txdb <- makeTxDbFromGFF('gencode.vM31.primary_assembly.annotation.gtf')
+txdb <- makeTxDbFromGFF('./data/00.reference/genome/gencode.vM32.chr_patch_hapl_scaff.annotation.gtf')
 
 ## get gene information
 all.genes <- genes(txdb)
@@ -111,7 +112,7 @@ write.table(
 BiocManager::install("DESeq2")
 library(DESeq2)
 
-group_list = c("D", "D", "B", "B", "A", "C", "A", "C") # all group labels corresponding to columns of countData
+group_list = c("A","A","A","B","B","B","C","C","C")
 
 geneID = countData$GeneID
 expMat = as.matrix(countData[,-c(1:3)])
@@ -121,10 +122,9 @@ rownames(expMat) = geneID
 
 
 # A vs B
-compare = "B/A"
-compare = "D/C"
-compare = "C/A"
-compare = "D/B"
+compare = "A/B"
+compare = "A/C"
+compare = "B/C"
 {
   group = unlist(strsplit(compare,"/"))
   BA = which(group_list %in% group)
@@ -149,9 +149,12 @@ compare = "D/B"
   
   # output the CPM matrix
   colname = c("GeneID",	"GeneName", "baseMean",	"log2FoldChange",	"lfcSE",	"stat",	"pvalue",	"padj")
+  parts <- strsplit(compare, "/")[[1]]
+  reversed <- paste(rev(parts), collapse = "/")
+  reversed2 <- paste(rev(parts), collapse = "vs")
   write.table(
     DEG_DEseq2[, colname],
-    file = paste0(outdir, "/DEG_DESeq2_",paste(group, collapse = ""),".tsv") ,
+    file = paste0(outdir, "/DEG_DESeq2_",paste(reversed2, collapse = ""),".tsv") ,
     quote = F,
     sep = "\t",
     row.names = F,
@@ -168,6 +171,7 @@ compare = "D/B"
   DEG_DEseq2$change = as.factor(ifelse(DEG_DEseq2$pvalue < 0.05 & abs(DEG_DEseq2$log2FoldChange) > logFC_t,
                                        ifelse(DEG_DEseq2$log2FoldChange > logFC_t, 'UP','DOWN'),'STABLE'))
   stats = table(DEG_DEseq2$change)
+
   
   pdf(file = paste0(outdir, "/DEG_DESeq2_",paste(group, collapse = ""),"_logFC_",logFC_t,"_plots.pdf"))
   # add top genes to show names in plot
@@ -175,7 +179,7 @@ compare = "D/B"
   p = ggplot(DEG_DEseq2,aes(x=log2FoldChange, y=-log10(pvalue),color=change))+
     geom_point(alpha=0.4,size=2) +
     theme_classic() +
-    xlab(paste0("log2FC(",compare,"; auto_cutoff=",logFC_t,")")) +
+    xlab(paste0("log2FC(",reversed,"; cutoff=",logFC_t,")")) +
     ylab("-log10(p-value)") +
     theme(plot.title = element_text(size = 15,hjust = 0.5)) +
     scale_colour_manual(values = c('#33a3dc','#72777b','#c85d44'),
