@@ -24,8 +24,8 @@ for ((i = 0; i < ${#sample_groups[@]}; i++)); do
     b1="$rmats_outdir/rmats_bams_group${sample_groups[i]}.txt"
     b2="$rmats_outdir/rmats_bams_group${sample_groups[j]}.txt"
     /data0/apps/anaconda3/bin/python /data0/apps/anaconda3/bin/rmats.py \
-      --b1 $b1 \
-      --b2 $b2 \
+      --b1 $b2 \
+      --b2 $b1 \
       --gtf $genome_gtf \
       --od "$rmats_outdir/${sample_groups[i]}_vs_${sample_groups[j]}" \
       --tmp "$rmats_outdir/tmp/${sample_groups[i]}_vs_${sample_groups[j]}" \
@@ -39,4 +39,5 @@ done
 # remove all temps
 rm -rf "$rmats_outdir/tmp"
 # compress all files and folders in $rmat_outdir in one zip
+rm -f "./results/06.rMATs.zip"
 zip -r "./results/06.rMATs.zip" "$rmats_outdir"
