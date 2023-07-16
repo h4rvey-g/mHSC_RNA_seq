@@ -36,8 +36,8 @@ for ((i = 0; i < ${#sample_groups[@]}; i++)); do
       --novelSS
   done
 done
-# remove all temps
-rm -rf "$rmats_outdir/tmp"
+# remove all tmp in subfolders
+find "$rmats_outdir" -name "tmp" | xargs rm -rf
 # compress all files and folders in $rmat_outdir in one zip
 rm -f "./results/06.rMATs.zip"
 zip -r "./results/06.rMATs.zip" "$rmats_outdir"
