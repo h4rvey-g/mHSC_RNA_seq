@@ -32,7 +32,6 @@ for ((i = 0; i < ${#sample_groups[@]}; i++)); do
       --readLength 140 \
       -t paired \
       --nthread 30 \
-      --statoff \
       --novelSS
   done
 done

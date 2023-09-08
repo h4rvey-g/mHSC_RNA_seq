@@ -109,23 +109,31 @@ write.table(
 
 
 # DEG analysis
-BiocManager::install("DESeq2")
-library(DESeq2)
-
-group_list = c("A","A","A","B","B","B","C","C","C")
-
-geneID = countData$GeneID
-expMat = as.matrix(countData[,-c(1:3)])
-rownames(expMat) = geneID
 
 #colData <- data.frame(row.names = colnames(expMat),group_list=group_list)
 
 
 # A vs B
-compare = "A/B"
-compare = "A/C"
-compare = "B/C"
-{
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("GenomicFeatures")
+library(GenomicFeatures)
+BiocManager::install("edgeR")
+library(edgeR)
+BiocManager::install("DESeq2")
+library(DESeq2)
+library(ggplot2)
+library(ggrepel)
+library(pheatmap)
+
+geneID = countData$GeneID
+expMat = as.matrix(countData[,-c(1:3)])
+rownames(expMat) = geneID
+group_list = c("A","A","A","B","B","B","C","C","C")
+
+comparisons <- c("A/B", "A/C", "B/C")
+
+for (compare in comparisons) {
   group = unlist(strsplit(compare,"/"))
   BA = which(group_list %in% group)
   expMat_BA = expMat[,BA]
@@ -136,7 +144,7 @@ compare = "B/C"
                                 design = ~ group_list)
   dds <- DESeq(dds,quiet = F) 
   
-  res <- results(dds,contrast=c("group_list", group))  #指定提取为B/A结果
+  res <- results(dds)  #指定提取为B/A结果
   
   
   resOrdered <- res[order(res$padj),]
@@ -162,11 +170,10 @@ compare = "B/C"
   )
   
   ###valcano_DEseq2
-  library(ggplot2)
-  library(ggrepel)
+  
   logFC_t <- with(DEG_DEseq2,mean(abs(log2FoldChange)) + 2*sd(abs(log2FoldChange)))
   logFC_t <- round(logFC_t,2)
-  logFC_t = 2 #ifelse(logFC_t >2, 2, logFC_t) 
+  # logFC_t = 2 #ifelse(logFC_t >2, 2, logFC_t) 
   
   DEG_DEseq2$change = as.factor(ifelse(DEG_DEseq2$pvalue < 0.05 & abs(DEG_DEseq2$log2FoldChange) > logFC_t,
                                        ifelse(DEG_DEseq2$log2FoldChange > logFC_t, 'UP','DOWN'),'STABLE'))
@@ -193,7 +200,7 @@ compare = "B/C"
     #                  show.legend = FALSE,max.overlaps = 20000)
   print(p)
   
-  library(pheatmap)
+  
   ###heatmap_DEseq2
   dat <- expMat_BA
   FC <- DEG_DEseq2$log2FoldChange
