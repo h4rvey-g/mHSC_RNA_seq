@@ -1,5 +1,6 @@
 # data folder
-data/
+data/*
+results/
 *.zip
 *fastqc.html
 # ignore file contains multiqc AND end with json, or txt, or log
