@@ -1,5 +1,6 @@
 {
   "python.testing.pytestArgs": ["codes"],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "r.lsp.promptToInstall": false
 }

@@ -1,6 +1,6 @@
 # data folder
 data/*
-results/
+results/0*
 *.zip
 *fastqc.html
 # ignore file contains multiqc AND end with json, or txt, or log
@@ -57,3 +57,8 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# nextflow log
+.nextflow.log*
+.nextflow/
+.vscode/
