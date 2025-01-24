@@ -62,3 +62,4 @@ rsconnect/
 .nextflow.log*
 .nextflow/
 .vscode/
+report_files/

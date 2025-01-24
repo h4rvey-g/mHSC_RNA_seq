@@ -6,6 +6,12 @@ run_isoformswitch <- function(group1, group2,
                               dIFcutoff = 0.1,
                               intersected_data) {
     # library(IsoformSwitchAnalyzeR)
+    # Create directory if it doesn't exist
+    dir.create("results/104.isoformswitch", recursive = TRUE, showWarnings = FALSE)
+
+    # Remove all files in the results/104.isoformswitch/group1_vs_group2 directory
+    unlink(sprintf("results/104.isoformswitch/%s_vs_%s", group1, group2), recursive = TRUE, force = TRUE)
+
     isoformSwitchAnalysisPart1 <- function(
         # Arguments
         switchAnalyzeRlist,

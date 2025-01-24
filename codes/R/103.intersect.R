@@ -1,16 +1,17 @@
-intersect_data <- function(dtu_data, exon_data, deg_data, p_cutoff = 0.05, log2fc_cutoff = 1, group1, group2) {
+intersect_data <- function(noiseq_res, exon_data, deg_data, p_cutoff = 0.05, log2fc_cutoff = 1, group1, group2) {
     # dtu_data <- dtu_data_KO4_WT
+    # noiseq_res <- noiseq_results_KO4_WT
     # exon_data <- exon_data_KO4_WT
     # deg_data <- deg_data_KO4_WT
     # 过滤数据
-    dtu_filtered <- dtu_data %>%
+    dtu_filtered <- noiseq_res %>%
         # col contains("dtu_gene") < p_cutoff
-        filter_at(vars(contains("padj")), all_vars(. < p_cutoff)) %>%
+        filter_at(vars(contains("gene_padj")), all_vars(. < p_cutoff)) %>%
         filter_at(vars(contains("log2fold")), all_vars(abs(.) > log2fc_cutoff))
     exon_filtered <- exon_data %>%
         # col contains("exon_gene") < p_cutoff
         filter_at(vars(contains("gene_padj")), all_vars(. < p_cutoff))
-        # filter_at(vars(contains("log2fold")), all_vars(abs(.) > log2fc_cutoff))
+    # filter_at(vars(contains("log2fold")), all_vars(abs(.) > log2fc_cutoff))
     deg_filtered <- deg_data %>%
         # col contains("deg_pval") < p_cutoff
         filter_at(vars(contains("pval")), all_vars(. < p_cutoff)) %>%
@@ -42,6 +43,7 @@ intersect_data <- function(dtu_data, exon_data, deg_data, p_cutoff = 0.05, log2f
     ggsave(sprintf("results/103.intersect/%s_vs_%s_intersection_p%.2f_fc%.1f.png", group1, group2, p_cutoff, log2fc_cutoff), p)
     # inner join of all three filtered data
     intersected_data <- dtu_filtered %>%
+        dplyr::select(geneID, contains("log2fold"), contains("gene_padj"), contains("mean"), transcript_id) %>%
         inner_join(
             exon_filtered %>%
                 dplyr::select(-contains("exon_exon_log2fold"), -contains("exon_exon_padj"), -featureID) %>%
@@ -56,7 +58,7 @@ intersect_data <- function(dtu_data, exon_data, deg_data, p_cutoff = 0.05, log2f
     intersected_data <- intersected_data %>%
         inner_join(conversion, by = c("geneID" = "input_id")) %>%
         # move gene_symbol to the first column
-        select(gene_symbol, everything())
+        dplyr::select(gene_symbol, everything())
     write_tsv(
         intersected_data,
         sprintf("results/103.intersect/%s_vs_%s_intersection_p%.2f_fc%.1f.tsv", group1, group2, p_cutoff, log2fc_cutoff)

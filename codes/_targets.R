@@ -6,7 +6,8 @@ tar_source(c(
     "codes/R/101.load_data.R",
     "codes/R/102.DESeq.R",
     "codes/R/103.intersect.R",
-    "codes/R/104.isoformswitch.R"
+    "codes/R/104.isoformswitch.R",
+    "codes/R/105.NOISeq.R"  # 添加新的R脚本
 ))
 tar_option_set(
     tidy_eval = FALSE,
@@ -35,7 +36,8 @@ mapped <- tar_map(
     tar_target(dtu_data, load_dtu(group1, group2)),
     tar_target(exon_data, load_exon(group1, group2)),
     tar_target(deg_data, run_DEG(se_data, group1, group2)),
-    tar_target(intersected_data, intersect_data(dtu_data, exon_data, deg_data,
+    tar_target(noiseq_results, run_noiseq_analysis(se_data, group1, group2)),
+    tar_target(intersected_data, intersect_data(noiseq_results, exon_data, deg_data,
         p_cutoff = 0.05,
         log2fc_cutoff = 1, group1, group2
     )),
@@ -64,6 +66,12 @@ combined_isoform <- tar_combine(
     mapped[["isoform_switch"]],
     command = list(!!!.x)
 )
+# 添加NOISeq结果的组合
+combined_noiseq <- tar_combine(
+    all_noiseq_results,
+    mapped[["noiseq_results"]],
+    command = list(!!!.x)
+)
 
 # Return the complete pipeline
 list(
@@ -75,5 +83,6 @@ list(
     combined_dtu,
     combined_exon,
     combined_deg,
-    combined_isoform
+    combined_isoform,
+    combined_noiseq  # 添加到返回列表
 )
