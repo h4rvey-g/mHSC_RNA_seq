@@ -43,9 +43,12 @@ mapped <- tar_map(
         log2fc_cutoff = 1, group1, group2
     )),
     tar_target(isoform_switch, run_isoformswitch(group1, group2, salmon_dir, gtf_file, transcript_fasta,
-        alpha = 0.05, dIFcutoff = 0.1, intersected_data
+        alpha = 0.05, dIFcutoff = 0.1, intersected_data, output_dir = "results/104.isoformswitch"
     )),
-    tar_target(Lin_LSK_intersected_data, Lin_LSK_intersect(group1, group2, intersected_data))
+    tar_target(Lin_LSK_intersected_data, Lin_LSK_intersect(group1, group2, intersected_data)),
+    tar_target(isoform_switch_Lin_LSK, run_isoformswitch(group1, group2, salmon_dir, gtf_file, transcript_fasta,
+        alpha = 1, dIFcutoff = 0, Lin_LSK_intersected_data, output_dir = "results/106.Lin_LSK_intersect/isofrom_switch"
+    ))
 )
 # Combine DTU results into a named list
 combined_dtu <- tar_combine(
@@ -86,5 +89,5 @@ list(
     combined_exon,
     combined_deg,
     combined_isoform,
-    combined_noiseq  # 添加到返回列表
+    combined_noiseq # 添加到返回列表
 )

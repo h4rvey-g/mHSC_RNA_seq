@@ -63,3 +63,4 @@ rsconnect/
 .nextflow/
 .vscode/
 report_files/
+*Sashimi_index*

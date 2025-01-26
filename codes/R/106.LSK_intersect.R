@@ -29,7 +29,7 @@ Lin_LSK_intersect <- function(group1, group2, intersected_data) {
     # create a new data frame with the intersected genes, and the log2fold values from both datasets
     intersected_Lin_LSK_data <- intersected_data_Lin %>%
         filter(gene_symbol %in% intersected_Lin_LSK) %>%
-        dplyr::select(gene_symbol, paste0(group1, "_vs_", group2, "_deg_log2fold")) %>%
+        dplyr::select(gene_symbol, geneID, paste0(group1, "_vs_", group2, "_deg_log2fold")) %>%
         distinct() %>%
         rename_at(vars(-gene_symbol), ~ paste0("Lin_", .)) %>%
         left_join(

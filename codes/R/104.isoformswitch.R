@@ -4,13 +4,14 @@ run_isoformswitch <- function(group1, group2,
                               transcript_fasta,
                               alpha = 0.05,
                               dIFcutoff = 0.1,
-                              intersected_data) {
-    # library(IsoformSwitchAnalyzeR)
+                              intersected_data,
+                              output_dir) {  # 改为 output_dir 参数
     # Create directory if it doesn't exist
-    dir.create("results/104.isoformswitch", recursive = TRUE, showWarnings = FALSE)
+    dir.create(output_dir, showWarnings = FALSE)
 
-    # Remove all files in the results/104.isoformswitch/group1_vs_group2 directory
-    unlink(sprintf("results/104.isoformswitch/%s_vs_%s", group1, group2), recursive = TRUE, force = TRUE)
+    # Remove all files in the output directory
+    unlink(file.path(output_dir, sprintf("%s_vs_%s", group1, group2)), 
+           recursive = TRUE, force = TRUE)
 
     isoformSwitchAnalysisPart1 <- function(
         # Arguments
@@ -255,7 +256,7 @@ run_isoformswitch <- function(group1, group2,
             switchList_filtered_analysed <- isoformSwitchAnalysisCombined(
                 switchList_filtered,
                 pathToGTF = gtf_file,
-                pathToOutput = sprintf("results/104.isoformswitch/%s_vs_%s", group1, group2),
+                pathToOutput = file.path(output_dir, sprintf("%s_vs_%s", group1, group2)),
                 alpha = alpha,
                 dIFcutoff = dIFcutoff
             )
@@ -263,17 +264,17 @@ run_isoformswitch <- function(group1, group2,
             # 保存结果
             write_csv(
                 extractSwitchSummary(switchList_filtered_analysed, filterForConsequences = FALSE),
-                sprintf("results/104.isoformswitch/%s_vs_%s_summary.csv", group1, group2)
+                file.path(output_dir, sprintf("%s_vs_%s_summary.csv", group1, group2))
             )
 
             write_csv(
                 switchList_filtered_analysed$isoformFeatures,
-                sprintf("results/104.isoformswitch/%s_vs_%s_isoformfeatures.csv", group1, group2)
+                file.path(output_dir, sprintf("%s_vs_%s_isoformfeatures.csv", group1, group2))
             )
 
             saveRDS(
                 switchList_filtered_analysed,
-                sprintf("results/104.isoformswitch/%s_vs_%s_switchlist.rds", group1, group2)
+                file.path(output_dir, sprintf("%s_vs_%s_switchlist.rds", group1, group2))
             )
         },
         error = function(e) {
