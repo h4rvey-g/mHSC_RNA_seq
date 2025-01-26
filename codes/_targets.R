@@ -7,7 +7,8 @@ tar_source(c(
     "codes/R/102.DESeq.R",
     "codes/R/103.intersect.R",
     "codes/R/104.isoformswitch.R",
-    "codes/R/105.NOISeq.R"  # 添加新的R脚本
+    "codes/R/105.NOISeq.R",
+    "codes/R/106.LSK_intersect.R"
 ))
 tar_option_set(
     tidy_eval = FALSE,
@@ -43,7 +44,8 @@ mapped <- tar_map(
     )),
     tar_target(isoform_switch, run_isoformswitch(group1, group2, salmon_dir, gtf_file, transcript_fasta,
         alpha = 0.05, dIFcutoff = 0.1, intersected_data
-    ))
+    )),
+    tar_target(Lin_LSK_intersected_data, Lin_LSK_intersect(group1, group2, intersected_data))
 )
 # Combine DTU results into a named list
 combined_dtu <- tar_combine(

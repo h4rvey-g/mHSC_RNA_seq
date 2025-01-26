@@ -219,6 +219,8 @@ run_noiseq_analysis <- function(se_data, group1, group2) {
         rename(!!paste0(group1, "_vs_", group2, "_dtu_log2fold") := log2FC) %>%
         # add dtu_ prefix to column paste0(group1, "_mean") and paste0(group2, "_mean")
         rename(!!paste0("dtu_", group1, "_mean") := paste0(group1, "_mean")) %>%
-        rename(!!paste0("dtu_", group2, "_mean") := paste0(group2, "_mean"))
+        rename(!!paste0("dtu_", group2, "_mean") := paste0(group2, "_mean")) %>%
+        # move geneID, transcript_id to the front
+        dplyr::select(geneID, transcript_id, everything())
     return(results_df)
 }
